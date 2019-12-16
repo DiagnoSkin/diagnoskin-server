@@ -1,0 +1,10 @@
+runtime: python37
+
+env_variables:
+  GOOGLE_APPLICATION_CREDENTIALS: "firebase-config/diagnoskin-48e89-firebase-adminsdk-2at6m-586f82c415.json"
+
+handlers:
+- url: /.*
+  secure: always
+  redirect_http_response_code: 301
+  script: auto

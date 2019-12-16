@@ -1,0 +1,8 @@
+numpy==1.17.4
+Flask==1.1.1
+Flask-RESTful==0.3.7
+Pillow==6.2.1
+firebase-admin==3.2.0
+
+tensorflow
+keras
