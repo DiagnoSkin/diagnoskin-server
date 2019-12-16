@@ -1,6 +1,9 @@
 # firebase project config file
 firebase-config/*
 
+# misc
+*.png
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
