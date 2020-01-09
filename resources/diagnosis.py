@@ -1,24 +1,38 @@
 from flask_restful import Resource, abort, reqparse
-import werkzeug
 from config import Config
 from PIL import Image
-import numpy
+import numpy as np
 from firebase_admin import auth
+import base64
+from io import BytesIO
+import model.ai as ai
+from flask import request
 
 class Diagnosis(Resource):
     def __init__(self):
         super().__init__()
         self.config = Config('./config.json')
         self.parser = reqparse.RequestParser()
-        self.parser.add_argument('image', type=werkzeug.datastructures.FileStorage, location='files')
+        self.parser.add_argument('image', required=True)
 
     def post(self):
-        image = self.__get_image_from_request()
-        valid, error = self.__validate_image(image)
-        if valid:
-            return { 'diagnosis': 'Cancer xd' }
+        if 'Authorization' in request.headers:
+            token = request.headers['Authorization'][7:]
+            # TODO validate token using firebase admin api
+            # for testing the endpoint is not secured
+            image = self.__get_image_from_request()
+            valid, error = self.__validate_image(image)
+            if valid:
+                prediction = ai.model.predict(image)
+                return { 'diagnosis': prediction }
+            else:
+                abort(400, error=error)
         else:
-            abort(400, error=error)
+            abort('Cannot authenticate user')
+
+    def get(self):
+        ai.model.summary()
+        return { 'model': 'ok' }
 
     def __validate_image(self, image):
         error = ''
@@ -34,11 +48,6 @@ class Diagnosis(Resource):
 
     def __get_image_from_request(self):
         data = self.parser.parse_args()
-        image_store = data['image']
-        if image_store != None:
-            image_pil = Image.open(image_store.stream)
-            image_pil.load()
-            return numpy.array(image_pil)[:,:,:3]
-        else:
-            abort(400, error='cannot find file with key \'image\' in the request')
-        return numpy.ndarray((1))
+        image = Image.open(BytesIO(base64.b64decode(data.image)))
+        image_numpy = np.array(image)[:,:,:3]
+        return image_numpy
