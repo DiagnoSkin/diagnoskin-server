@@ -23,12 +23,15 @@ class Diagnosis(Resource):
             image = self.__get_image_from_request()
             valid, error = self.__validate_image(image)
             if valid:
-                prediction = ai.model.predict(image)
+                inp = []
+                inp.append(image)
+                inp = np.array(inp)
+                prediction = ai.model.predict(inp)
                 return { 'diagnosis': prediction }
             else:
                 abort(400, error=error)
         else:
-            abort('Cannot authenticate user')
+            abort(400, error='Cannot authenticate user')
 
     def get(self):
         ai.model.summary()
