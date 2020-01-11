@@ -8,7 +8,7 @@ from google.cloud import storage
 from keras import backend as K
 
 # model_file = file_io.FileIO('gs://prediction-model-storage/EfficientNetB0-1024-0.4-1024-7.best.h5', mode='rb')
-local_model_name = './EfficientNetB0-1024-0.4-1024-7.best.h5'
+local_model_name = './model/EfficientNetB0-1024-0.4-1024-7.best.h5'
 bucket_name = "prediction-model-storage"
 bucket_model_name = "EfficientNetB0-1024-0.4-1024-7.best.h5"
 
