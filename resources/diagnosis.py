@@ -30,7 +30,7 @@ class Diagnosis(Resource):
                 inp.append(image.astype(float))
                 inp = np.array(inp)
                 prediction = ai.model.predict(inp)
-                return { 'diagnosis': ai.map_prediction_to_label(prediction) }
+                return { 'diagnosis': ai.map_prediction_to_label(prediction), 'result': self.__encode_image(image) }
             else:
                 abort(400, error=error)
         else:
@@ -62,3 +62,9 @@ class Diagnosis(Resource):
         targetCenter = (center[0] * scale, center[1] * scale)
         targetRadius = radius * scale
         return (int(targetCenter[0] - targetRadius), int(targetCenter[1] - targetRadius), int(targetCenter[0] + targetRadius), int(targetCenter[1] + targetRadius))
+
+    def __encode_image(self, image):
+        buffered = BytesIO()
+        image.save(buffered, format="JPEG")
+        img_str = base64.b64encode(buffered.getvalue())
+        return f"{img_str}"[2:-1]
