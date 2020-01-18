@@ -1,6 +1,7 @@
 from tensorflow.keras.models import load_model
 from tensorflow.python.lib.io import file_io
 from os import path
+import numpy as np
 import aiohttp
 import asyncio
 import efficientnet.tfkeras
@@ -11,6 +12,11 @@ from keras import backend as K
 local_model_name = './model/EfficientNetB0-1024-0.4-1024-7.best.h5'
 bucket_name = "prediction-model-storage"
 bucket_model_name = "EfficientNetB0-1024-0.4-1024-7.best.h5"
+
+def map_prediction_to_label(prediction):
+    labels = ['akiec', 'bcc', 'bkl', 'df', 'mel','nv', 'vasc']
+    pred_index = np.argmax(prediction[0])
+    return labels[pred_index]
 
 def recall_m(y_true, y_pred):
     true_positives = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
