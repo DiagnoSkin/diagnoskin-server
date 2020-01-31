@@ -21,8 +21,7 @@ class Diagnosis(Resource):
     def post(self):
         if 'Authorization' in request.headers:
             token = request.headers['Authorization'][7:]
-            # TODO validate token using firebase admin api
-            # for testing the endpoint is not secured
+            self.__verify_token(token)
             image = self.__get_image_from_request()
             valid, error = self.__validate_image(image)
             if valid:
@@ -30,6 +29,8 @@ class Diagnosis(Resource):
                 inp.append(image.astype(float))
                 inp = np.array(inp)
                 prediction = ai.model.predict(inp)
+                explanation = ai.explainer.explain_instance(inp[0], ai.model.predict, top_labels=5, hide_color=0, num_samples=1000)
+                image, mask = explanation.get_image_and_mask(explanation.top_labels[0], positive_only=False, num_features=10, hide_rest=False)
                 return { 'diagnosis': ai.map_prediction_to_label(prediction), 'result': self.__encode_image(image) }
             else:
                 abort(400, error=error)
@@ -64,7 +65,21 @@ class Diagnosis(Resource):
         return (int(targetCenter[0] - targetRadius), int(targetCenter[1] - targetRadius), int(targetCenter[0] + targetRadius), int(targetCenter[1] + targetRadius))
 
     def __encode_image(self, image):
+        if hasattr(image, 'shape'):
+            imageToEncode = Image.fromarray(image.astype(int))
+        else:
+            imageToEncode = image
+        imageToEncode.save('./image.jpg')
         buffered = BytesIO()
-        image.save(buffered, format="JPEG")
+        imageToEncode.save(buffered, format="JPEG")
         img_str = base64.b64encode(buffered.getvalue())
         return f"{img_str}"[2:-1]
+    
+    def __verify_token(self, token):
+        try:
+            tokenValues = auth.verify_id_token(token)
+            return tokenValues
+        except auth.InvalidIdTokenError as invalidTokenError:
+            abort(401, error='token invalid')
+        except auth.ExpiredIdTokenError as expiredTokenError:
+            abort(401, error='token expired')
