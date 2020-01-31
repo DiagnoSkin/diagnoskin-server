@@ -41,3 +41,6 @@ loop = asyncio.get_event_loop()
 tasks = [asyncio.ensure_future(setup_model())]
 model = loop.run_until_complete(asyncio.gather(*tasks))[0]
 loop.close()
+
+from lime import lime_image
+explainer = lime_image.LimeImageExplainer()
