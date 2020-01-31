@@ -69,7 +69,6 @@ class Diagnosis(Resource):
             imageToEncode = Image.fromarray(image.astype(int))
         else:
             imageToEncode = image
-        imageToEncode.save('./image.jpg')
         buffered = BytesIO()
         imageToEncode.save(buffered, format="JPEG")
         img_str = base64.b64encode(buffered.getvalue())
