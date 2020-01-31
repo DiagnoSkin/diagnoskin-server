@@ -16,4 +16,4 @@ class Hello(Resource):
             image_numpy = np.array(image)
             return { 'message': f"data: {image_numpy}" }
         else:
-            abort(400, error='Cannot find Authentication header')
+            abort(400, error='Cannot find Authorization header')
