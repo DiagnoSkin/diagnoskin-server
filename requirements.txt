@@ -8,6 +8,6 @@ gunicorn==20.0.4
 tensorflow
 keras
 asyncio==3.4.3
-aiohttp==3.6.2
+aiohttp==3.7.4
 -e git+https://github.com/qubvel/efficientnet#egg=MyProject
 lime==0.1.1.37
